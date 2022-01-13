@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 
@@ -13,7 +14,7 @@ import (
 type ActorRepository interface {
 	Create(ctx context.Context, tx pgx.Tx, actor entity.Actor) entity.Actor
 	Update(ctx context.Context, tx pgx.Tx, actor entity.Actor) entity.Actor
-	Delete(ctx context.Context, tx pgx.Tx, actor entity.Actor)
+	Delete(ctx context.Context, tx pgx.Tx, actor entity.Actor) error
 	FindById(ctx context.Context, tx pgx.Tx, actor entity.Actor) entity.Actor
 	FindAll(ctx context.Context, tx pgx.Tx) []entity.Actor
 	Search(ctx context.Context, tx pgx.Tx, key string) []entity.Actor
@@ -43,15 +44,48 @@ func (repository *actorRepository) Create(ctx context.Context, tx pgx.Tx, actor 
 }
 
 func (repository *actorRepository) Update(ctx context.Context, tx pgx.Tx, actor entity.Actor) entity.Actor {
-	panic("")
+	queryString := "UPDATE actor SET first_name = $2, last_name = $3 WHERE actor_id = $1;"
+
+	cmdTag, err := tx.Exec(ctx, queryString, actor.ActorId, actor.FirstName, actor.LastName)
+	helper.PanicIfError(err)
+
+	var result entity.Actor
+	if cmdTag.RowsAffected() < 1 {
+		return result
+	}
+
+	result.ActorId = actor.ActorId
+	result.FirstName = actor.FirstName
+	result.LastName = actor.LastName
+	result.LastUpdate = time.Now()
+
+	return result
 }
 
-func (repository *actorRepository) Delete(ctx context.Context, tx pgx.Tx, actor entity.Actor) {
-	panic("")
+func (repository *actorRepository) Delete(ctx context.Context, tx pgx.Tx, actor entity.Actor) error {
+	queryString := "DELETE FROM actor WHERE actor_id = $1"
+
+	cmdTag, err := tx.Exec(ctx, queryString, actor.ActorId)
+	helper.PanicIfError(err)
+	if !cmdTag.Delete() {
+		fmt.Printf("Record with id %d not found", actor.ActorId)
+		return err
+	}
+	return nil
 }
 
 func (repository *actorRepository) FindById(ctx context.Context, tx pgx.Tx, actor entity.Actor) entity.Actor {
-	panic("")
+	queryString := "SELECT actor_id, first_name, last_name, last_update FROM actor WHERE actor_id = $1"
+
+	row := tx.QueryRow(ctx, queryString, actor.ActorId)
+
+	var result entity.Actor
+
+	err := row.Scan(&result.ActorId, &result.FirstName, &result.LastName, &result.LastUpdate)
+	helper.PanicIfError(err)
+
+	return result
+
 }
 
 func (repository *actorRepository) FindAll(ctx context.Context, tx pgx.Tx) []entity.Actor {

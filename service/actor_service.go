@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
@@ -17,6 +18,9 @@ type ActorService interface {
 	Create(ctx context.Context, requset web.RequestCreateActor) web.ResponseWeb
 	FindAll(ctx context.Context) web.ResponseWeb
 	Search(ctx context.Context, key string) web.ResponseWeb
+	Update(ctx context.Context, request web.RequestUpdateActor) web.ResponseWeb
+	Delete(ctx context.Context, actorId int64) web.ResponseWeb
+	FindById(ctx context.Context, actorId int64) web.ResponseWeb
 }
 
 type actorService struct {
@@ -78,5 +82,46 @@ func (service *actorService) Search(ctx context.Context, key string) web.Respons
 		Code:   http.StatusOK,
 		Status: "Success",
 		Data:   actors,
+	}
+}
+
+func (service *actorService) Update(ctx context.Context, request web.RequestUpdateActor) web.ResponseWeb {
+	err := service.Validator.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	actor := service.Repository.Update(ctx, tx, entity.Actor{ActorId: request.ActorId, FirstName: request.FirstName, LastName: request.LastName})
+
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   actor,
+	}
+}
+
+func (service *actorService) Delete(ctx context.Context, actorId int64) web.ResponseWeb {
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	service.Repository.Delete(ctx, tx, entity.Actor{ActorId: actorId})
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   fmt.Sprintf("Actor with id %d was deleted", actorId),
+	}
+}
+
+func (service *actorService) FindById(ctx context.Context, actorId int64) web.ResponseWeb {
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	actor := service.Repository.FindById(ctx, tx, entity.Actor{ActorId: actorId})
+
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   actor,
 	}
 }
