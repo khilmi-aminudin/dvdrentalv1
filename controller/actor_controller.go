@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
@@ -11,9 +12,9 @@ import (
 
 type ActorController interface {
 	Create(c *gin.Context)
-	// Update(c *gin.Context)
-	// Delete(c *gin.Context)
-	// FindById(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
+	FindById(c *gin.Context)
 	FindAll(c *gin.Context)
 	Search(c *gin.Context)
 }
@@ -38,35 +39,35 @@ func (controller *actorController) Create(c *gin.Context) {
 
 }
 
-// func (controller *actorController) Update(c *gin.Context) {
-// 	var requestUpdateActor web.RequestUpdateActor
-// 	err := c.BindJSON(&requestUpdateActor)
-// 	helper.PanicIfError(err)
+func (controller *actorController) Update(c *gin.Context) {
+	var requestUpdateActor web.RequestUpdateActor
+	err := c.BindJSON(&requestUpdateActor)
+	helper.PanicIfError(err)
 
-// 	response := controller.Service.Update(c.Request.Context(), requestUpdateActor)
-// 	c.JSON(http.StatusOK, response)
-// }
+	response := controller.Service.Update(c.Request.Context(), requestUpdateActor)
+	c.JSON(http.StatusOK, response)
+}
 
-// func (controller *actorController) Delete(c *gin.Context) {
-// 	actorId := c.Param("id")
-// 	id, err := strconv.Atoi(actorId)
-// 	helper.PanicIfError(err)
+func (controller *actorController) Delete(c *gin.Context) {
+	actorId := c.Param("id")
+	id, err := strconv.Atoi(actorId)
+	helper.PanicIfError(err)
 
-// 	controller.Service.Delete(c.Request.Context(), int64(id))
-// 	c.JSON(http.StatusOK, web.ResponseWeb{
-// 		Code:   http.StatusOK,
-// 		Status: "Success",
-// 	})
-// }
+	controller.Service.Delete(c.Request.Context(), int64(id))
+	c.JSON(http.StatusOK, web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+	})
+}
 
-// func (controller *actorController) FindById(c *gin.Context) {
-// 	actorId := c.Param("id")
-// 	id, err := strconv.Atoi(actorId)
-// 	helper.PanicIfError(err)
+func (controller *actorController) FindById(c *gin.Context) {
+	actorId := c.Param("id")
+	id, err := strconv.Atoi(actorId)
+	helper.PanicIfError(err)
 
-// 	response := controller.Service.FindById(c.Request.Context(), int64(id))
-// 	c.JSON(http.StatusOK, response)
-// }
+	response := controller.Service.FindById(c.Request.Context(), int64(id))
+	c.JSON(http.StatusOK, response)
+}
 
 func (controller *actorController) FindAll(c *gin.Context) {
 	response := controller.Service.FindAll(c.Request.Context())

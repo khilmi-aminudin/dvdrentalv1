@@ -20,11 +20,11 @@ func ActorRouter(r *gin.Engine) {
 		controller controller.ActorController = controller.NewActorController(service)
 	)
 
-	// r.GET("/api/actor/:id", controller.FindById)
+	r.GET("/api/actor/:id", controller.FindById)
 	r.GET("/api/actor", controller.FindAll)
 	r.POST("/api/actor", controller.Create)
-	// r.DELETE("/api/actor/:id", controller.Delete)
-	// r.PUT("/api/actor", controller.Update)
+	r.DELETE("/api/actor/:id", controller.Delete)
+	r.PUT("/api/actor", controller.Update)
 	r.GET("/api/actor/search", controller.Search)
 
 }
