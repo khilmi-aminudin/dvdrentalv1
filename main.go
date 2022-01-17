@@ -9,5 +9,6 @@ func main() {
 	r := gin.Default()
 	router.UserRouter(r)
 	router.ActorRouter(r)
+	router.AuthRouter(r)
 	r.Run()
 }

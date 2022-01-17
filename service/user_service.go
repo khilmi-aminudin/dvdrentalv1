@@ -46,7 +46,7 @@ func (service *userService) Create(ctx context.Context, request web.RequestCreat
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	hashedPassword := helper.NewSHA256([]byte(request.Passowrd))
 
@@ -66,7 +66,7 @@ func (service *userService) FindAll(ctx context.Context) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	users := service.Repository.FindAll(ctx, tx)
 
@@ -80,7 +80,7 @@ func (service *userService) FindAll(ctx context.Context) web.ResponseWeb {
 func (service *userService) FindByUsername(ctx context.Context, username string) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	user := service.Repository.FindByUsername(ctx, tx, username)
 
