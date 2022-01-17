@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 	"github.com/khilmi-aminudin/dvdrentalv1/models/entity"
@@ -11,10 +13,11 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
+	Update(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
+	Delete(ctx context.Context, tx pgx.Tx, user entity.Users) error
+	FindById(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
 	FindAll(ctx context.Context, tx pgx.Tx) []entity.Users
 	FindByUsername(ctx context.Context, tx pgx.Tx, username string) entity.Users
-	Update(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
-	Delete()
 }
 
 type userRepository struct{}
@@ -72,8 +75,48 @@ func (repository *userRepository) FindByUsername(ctx context.Context, tx pgx.Tx,
 }
 
 func (repository *userRepository) Update(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users {
-	panic("")
-}
-func (repository *userRepository) Delete() {
+	queryString := "UPDATE users SET username = $1, password = $2, last_update $3 WHERE username = $1;"
 
+	cmdTag, err := tx.Exec(ctx, queryString, user.Username, user.Passowrd, user.LastUpdate)
+	helper.PanicIfError(err)
+
+	var result entity.Users
+	if cmdTag.Update() {
+		return result
+	}
+
+	result.UserId = user.UserId
+	result.Username = user.Username
+	result.Passowrd = user.Passowrd
+	result.LastUpdate = time.Now()
+
+	return result
+
+}
+
+func (repository *userRepository) Delete(ctx context.Context, tx pgx.Tx, user entity.Users) error {
+	queryString := "DELETE FROM actor WHERE user_id = $1;"
+
+	cmdTag, err := tx.Exec(ctx, queryString, user.UserId)
+
+	if !cmdTag.Delete() {
+		return err
+	}
+	return nil
+}
+
+func (repository *userRepository) FindById(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users {
+	queryString := "SELECT user_id, username,password,last_upadte FROM users WHERE user_id = $1;"
+
+	row := tx.QueryRow(ctx, queryString, user.UserId)
+
+	var result entity.Users
+
+	err := row.Scan(&result.UserId, &result.Username, &result.Passowrd, &result.LastUpdate)
+	// helper.PanicIfError(err)
+	if err == *&sql.ErrNoRows {
+		return result
+	}
+
+	return result
 }

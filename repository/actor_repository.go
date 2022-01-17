@@ -67,7 +67,7 @@ func (repository *actorRepository) Delete(ctx context.Context, tx pgx.Tx, actor 
 	queryString := "DELETE FROM actor WHERE actor_id = $1"
 
 	cmdTag, err := tx.Exec(ctx, queryString, actor.ActorId)
-	helper.PanicIfError(err)
+
 	if !cmdTag.Delete() {
 		return err
 	}

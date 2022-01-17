@@ -44,7 +44,7 @@ func (service *actorService) Create(ctx context.Context, requset web.RequestCrea
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	actor := service.Repository.Create(ctx, tx, entity.Actor{FirstName: requset.FirstName, LastName: requset.LastName})
 
@@ -59,7 +59,7 @@ func (service *actorService) FindAll(ctx context.Context) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	actors := service.Repository.FindAll(ctx, tx)
 
@@ -74,7 +74,7 @@ func (service *actorService) Search(ctx context.Context, key string) web.Respons
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	defer tx.Commit(ctx)
+	defer helper.CommirOrRollback(tx, ctx)
 
 	actors := service.Repository.Search(ctx, tx, key)
 
@@ -92,6 +92,8 @@ func (service *actorService) Update(ctx context.Context, request web.RequestUpda
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
+	defer helper.CommirOrRollback(tx, ctx)
+
 	actor := service.Repository.Update(ctx, tx, entity.Actor{ActorId: request.ActorId, FirstName: request.FirstName, LastName: request.LastName})
 
 	return web.ResponseWeb{
@@ -104,6 +106,8 @@ func (service *actorService) Update(ctx context.Context, request web.RequestUpda
 func (service *actorService) Delete(ctx context.Context, actorId int64) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
 
 	actor := service.Repository.FindById(ctx, tx, entity.Actor{ActorId: actorId})
 
@@ -135,6 +139,8 @@ func (service *actorService) Delete(ctx context.Context, actorId int64) web.Resp
 func (service *actorService) FindById(ctx context.Context, actorId int64) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
 
 	actor := service.Repository.FindById(ctx, tx, entity.Actor{ActorId: actorId})
 

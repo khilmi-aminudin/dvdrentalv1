@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 	"github.com/khilmi-aminudin/dvdrentalv1/models/entity"
 	"github.com/khilmi-aminudin/dvdrentalv1/models/web"
@@ -15,10 +18,11 @@ import (
 
 type UserService interface {
 	Create(ctx context.Context, request web.RequestCreateUser) web.ResponseWeb
-	FindAll(ctx context.Context) web.ResponseWeb
-	FindByUsername(ctx context.Context, username string) web.ResponseWeb
 	Update(ctx context.Context, request web.RequestUpdateUser) web.ResponseWeb
 	Delete(ctx context.Context, userid int64) web.ResponseWeb
+	FindById(ctx context.Context, userid int64) web.ResponseWeb
+	FindAll(ctx context.Context) web.ResponseWeb
+	FindByUsername(ctx context.Context, username string) web.ResponseWeb
 }
 
 type userService struct {
@@ -88,8 +92,72 @@ func (service *userService) FindByUsername(ctx context.Context, username string)
 }
 
 func (service *userService) Update(ctx context.Context, request web.RequestUpdateUser) web.ResponseWeb {
-	panic("")
+	err := service.Validator.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
+
+	user := service.Repository.Update(ctx, tx, entity.Users{
+		Username:   request.Username,
+		Passowrd:   request.Passowrd,
+		LastUpdate: time.Now(),
+	})
+
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   user,
+	}
+
 }
+
 func (service *userService) Delete(ctx context.Context, userid int64) web.ResponseWeb {
-	panic("")
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
+
+	err = service.Repository.Delete(ctx, tx, entity.Users{UserId: userid})
+
+	if err != nil {
+		return web.ResponseWeb{
+			Code:   http.StatusBadRequest,
+			Status: "Bad Request",
+			Data: gin.H{
+				"message": err.Error(),
+			},
+		}
+	}
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+	}
+}
+
+func (service *userService) FindById(ctx context.Context, userid int64) web.ResponseWeb {
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
+
+	user := service.Repository.FindById(ctx, tx, entity.Users{UserId: userid})
+
+	var emptyUser entity.Users
+	if user == emptyUser {
+		return web.ResponseWeb{
+			Code:   http.StatusNotFound,
+			Status: "Not Found",
+			Data: gin.H{
+				"message": fmt.Sprintf("user with id %d not found", userid),
+			},
+		}
+	}
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   user,
+	}
 }
