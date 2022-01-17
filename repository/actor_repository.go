@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -68,7 +69,6 @@ func (repository *actorRepository) Delete(ctx context.Context, tx pgx.Tx, actor 
 	cmdTag, err := tx.Exec(ctx, queryString, actor.ActorId)
 	helper.PanicIfError(err)
 	if !cmdTag.Delete() {
-		fmt.Printf("Record with id %d not found", actor.ActorId)
 		return err
 	}
 	return nil
@@ -82,7 +82,10 @@ func (repository *actorRepository) FindById(ctx context.Context, tx pgx.Tx, acto
 	var result entity.Actor
 
 	err := row.Scan(&result.ActorId, &result.FirstName, &result.LastName, &result.LastUpdate)
-	helper.PanicIfError(err)
+	// helper.PanicIfError(err)
+	if err == *&sql.ErrNoRows {
+		return result
+	}
 
 	return result
 

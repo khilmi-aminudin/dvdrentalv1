@@ -105,7 +105,26 @@ func (service *actorService) Delete(ctx context.Context, actorId int64) web.Resp
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
-	service.Repository.Delete(ctx, tx, entity.Actor{ActorId: actorId})
+	actor := service.Repository.FindById(ctx, tx, entity.Actor{ActorId: actorId})
+
+	var emptyActor entity.Actor
+
+	if actor == emptyActor {
+		return web.ResponseWeb{
+			Code:   http.StatusNotFound,
+			Status: "Not Found",
+		}
+	}
+	err = service.Repository.Delete(ctx, tx, entity.Actor{ActorId: actorId})
+
+	if err != nil {
+		return web.ResponseWeb{
+			Code:   http.StatusBadRequest,
+			Status: "Bad Request",
+			Data:   err.Error(),
+		}
+	}
+
 	return web.ResponseWeb{
 		Code:   http.StatusOK,
 		Status: "Success",
@@ -118,6 +137,15 @@ func (service *actorService) FindById(ctx context.Context, actorId int64) web.Re
 	helper.PanicIfError(err)
 
 	actor := service.Repository.FindById(ctx, tx, entity.Actor{ActorId: actorId})
+
+	var emptyActor entity.Actor
+	if actor == emptyActor {
+		return web.ResponseWeb{
+			Code:   http.StatusNotFound,
+			Status: "Not Found",
+			Data:   "Data not found",
+		}
+	}
 
 	return web.ResponseWeb{
 		Code:   http.StatusOK,

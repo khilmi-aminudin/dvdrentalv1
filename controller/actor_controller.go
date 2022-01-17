@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -53,10 +54,25 @@ func (controller *actorController) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(actorId)
 	helper.PanicIfError(err)
 
-	controller.Service.Delete(c.Request.Context(), int64(id))
+	response := controller.Service.Delete(c.Request.Context(), int64(id))
+
+	if response.Data == nil {
+		c.JSON(http.StatusNotFound, web.ResponseWeb{
+			Code:   http.StatusNotFound,
+			Status: "Not Found",
+			Data: map[string]string{
+				"message": fmt.Sprintf("data with id %d not exist", id),
+			},
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, web.ResponseWeb{
 		Code:   http.StatusOK,
 		Status: "Success",
+		Data: map[string]string{
+			"message": fmt.Sprintf("data with id %d was deleted", id),
+		},
 	})
 }
 
@@ -66,6 +82,10 @@ func (controller *actorController) FindById(c *gin.Context) {
 	helper.PanicIfError(err)
 
 	response := controller.Service.FindById(c.Request.Context(), int64(id))
+	if fmt.Sprintf("%T", response.Data) == "string" {
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
 	c.JSON(http.StatusOK, response)
 }
 

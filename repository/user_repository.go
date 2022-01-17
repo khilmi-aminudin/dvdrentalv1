@@ -13,6 +13,8 @@ type UserRepository interface {
 	Create(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
 	FindAll(ctx context.Context, tx pgx.Tx) []entity.Users
 	FindByUsername(ctx context.Context, tx pgx.Tx, username string) entity.Users
+	Update(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
+	Delete()
 }
 
 type userRepository struct{}
@@ -67,4 +69,11 @@ func (repository *userRepository) FindByUsername(ctx context.Context, tx pgx.Tx,
 	helper.PanicIfError(err)
 
 	return user
+}
+
+func (repository *userRepository) Update(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users {
+	panic("")
+}
+func (repository *userRepository) Delete() {
+
 }

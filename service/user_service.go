@@ -17,6 +17,8 @@ type UserService interface {
 	Create(ctx context.Context, request web.RequestCreateUser) web.ResponseWeb
 	FindAll(ctx context.Context) web.ResponseWeb
 	FindByUsername(ctx context.Context, username string) web.ResponseWeb
+	Update(ctx context.Context, request web.RequestUpdateUser) web.ResponseWeb
+	Delete(ctx context.Context, userid int64) web.ResponseWeb
 }
 
 type userService struct {
@@ -83,4 +85,11 @@ func (service *userService) FindByUsername(ctx context.Context, username string)
 		Status: "Success",
 		Data:   user,
 	}
+}
+
+func (service *userService) Update(ctx context.Context, request web.RequestUpdateUser) web.ResponseWeb {
+	panic("")
+}
+func (service *userService) Delete(ctx context.Context, userid int64) web.ResponseWeb {
+	panic("")
 }

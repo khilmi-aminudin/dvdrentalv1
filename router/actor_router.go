@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/khilmi-aminudin/dvdrentalv1/controller"
 	"github.com/khilmi-aminudin/dvdrentalv1/db"
+	"github.com/khilmi-aminudin/dvdrentalv1/middlewares"
 	"github.com/khilmi-aminudin/dvdrentalv1/repository"
 	"github.com/khilmi-aminudin/dvdrentalv1/service"
 
@@ -20,11 +21,13 @@ func ActorRouter(r *gin.Engine) {
 		controller controller.ActorController = controller.NewActorController(service)
 	)
 
-	r.GET("/api/actor/:id", controller.FindById)
-	r.GET("/api/actor", controller.FindAll)
-	r.POST("/api/actor", controller.Create)
-	r.DELETE("/api/actor/:id", controller.Delete)
-	r.PUT("/api/actor", controller.Update)
-	r.GET("/api/actor/search", controller.Search)
+	authorized := r.Group("/api/actor", middlewares.BasicAuth())
+
+	authorized.GET("/:id", controller.FindById)
+	authorized.GET("/", controller.FindAll)
+	authorized.POST("/", controller.Create)
+	authorized.DELETE("/:id", controller.Delete)
+	authorized.PUT("/", controller.Update)
+	authorized.GET("/search", controller.Search)
 
 }
