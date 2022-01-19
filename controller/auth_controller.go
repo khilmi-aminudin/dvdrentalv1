@@ -15,12 +15,14 @@ type AuthController interface {
 }
 
 type authcontroller struct {
-	auth service.Authentication
+	auth       service.Authentication
+	jwtservice service.JWTService
 }
 
-func NewAuthController(authservice service.Authentication) AuthController {
+func NewAuthController(authservice service.Authentication, jwtsrvc service.JWTService) AuthController {
 	return &authcontroller{
-		auth: authservice,
+		auth:       authservice,
+		jwtservice: jwtsrvc,
 	}
 }
 
@@ -39,7 +41,8 @@ func (controller *authcontroller) Login(c *gin.Context) {
 	}
 
 	hashedpassword := helper.NewSHA256([]byte(credential.Password))
-	if !controller.auth.Login(credential.Username, hashedpassword) {
+	isSignin := controller.auth.Login(credential.Username, hashedpassword)
+	if !isSignin {
 
 		c.JSON(http.StatusUnauthorized, web.ResponseWeb{
 			Code:   http.StatusUnauthorized,
@@ -47,7 +50,7 @@ func (controller *authcontroller) Login(c *gin.Context) {
 			Data:   credential,
 		})
 	} else {
-		var token string
+		token := controller.jwtservice.GenerateToken(credential.Username, isSignin)
 		c.JSON(http.StatusOK, web.ResponseWeb{
 			Code:   http.StatusOK,
 			Status: "Authorized",

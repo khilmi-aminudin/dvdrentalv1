@@ -3,6 +3,7 @@ module github.com/khilmi-aminudin/dvdrentalv1
 go 1.17
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/jackc/pgx/v4 v4.14.1

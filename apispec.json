@@ -1,29 +1,29 @@
 {
     "openapi": "3.0.3",
     "info": {
-      "title": "Category RESTful API",
-      "description": "API Spec for Category RESTful API",
+      "title": "DVDRENTAL RESTful API",
+      "description": "API Spec for Dvdrental RESTful API",
       "version": "1.0.0"
     },
     "servers": [
       {
-        "url": "http://localhost:3000/api"
+        "url": "http://localhost:8080/api"
       }
     ],
     "paths": {
-      "/categories": {
+      "/actor": {
         "get": {
           "security": [{
-            "CategoryAuth" : []
+            "JWTAuth" : []
           }],
           "tags": [
-            "Category API"
+            "Actor API"
           ],
-          "description": "List all Categories",
-          "summary": "List all Categories",
+          "description": "List all Actor",
+          "summary": "List all Actor",
           "responses": {
             "200": {
-              "description": "Success get all categories",
+              "description": "Success get all actor",
               "content": {
                 "application/json": {
                   "schema": {
@@ -38,7 +38,7 @@
                       "data": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/Category"
+                          "$ref": "#/components/schemas/Actor"
                         }
                       }
                     }
@@ -50,23 +50,23 @@
         },
         "post": {
           "security": [{
-            "CategoryAuth" : []
+            "JWTAuth" : []
           }],
-          "tags": ["Category API"],
-          "description": "Create new Category",
-          "summary": "Create new Category",
+          "tags": ["Actor API"],
+          "description": "Create new Actor",
+          "summary": "Create new Actor",
           "requestBody": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateOrUpdateCategory"
+                  "$ref": "#/components/schemas/CreateActor"
                 }
               }
             }
           },
           "responses": {
             "200": {
-              "description": "Success Create Category",
+              "description": "Success Create Actor",
               "content": {
                 "application/json": {
                   "schema": {
@@ -79,7 +79,7 @@
                         "type": "string"
                       },
                       "data" : {
-                        "$ref": "#/components/schemas/Category"
+                        "$ref": "#/components/schemas/Actor"
                       }
                     }
                   }
@@ -89,26 +89,26 @@
           }
         }
       },
-      "/categories/{categoryId}" : {
+      "/actor/{actorId}" : {
         "get" : {
           "security": [{
-            "CategoryAuth" : []
+            "JWTAuth" : []
           }],
-          "tags": ["Category API"],
-          "summary": "Get category by Id",
-          "description": "Get category by id",
+          "tags": ["Actor API"],
+          "summary": "Get actor by Id",
+          "description": "Get actor by id",
           "parameters": [
             {
               "schema":{},
               "required": true,
-              "name": "categoryId",
+              "name": "actorId",
               "in": "path",
-              "description": "Category Id"
+              "description": "actor Id"
             }
           ],
           "responses": {
             "200" : {
-              "description": "Success get category",
+              "description": "Success get actor",
               "content": {
                 "application/json": {
                   "schema": {
@@ -121,7 +121,7 @@
                         "type": "string"
                       },
                       "data" : {
-                        "$ref": "#/components/schemas/Category"
+                        "$ref": "#/components/schemas/Actor"
                       }
                     }
                   }
@@ -132,32 +132,32 @@
         },
         "put" : {
           "security": [{
-            "CategoryAuth" : []
+            "JWTAuth" : []
           }],
-          "tags": ["Category API"],
-          "summary": "Update category by Id",
-          "description": "Update category by Id",
+          "tags": ["Actor API"],
+          "summary": "Update actor by Id",
+          "description": "Update actor by Id",
           "parameters": [
             {
               "schema":{},
               "required": true,
-              "name": "categoryId",
+              "name": "actorId",
               "in": "path",
-              "description": "Category Id"
+              "description": "actor Id"
             }
           ],
           "requestBody": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateOrUpdateCategory"
+                  "$ref": "#/components/schemas/UpdateActor"
                 }
               }
             }
           },
           "responses": {
             "200" : {
-              "description": "Success get category",
+              "description": "Success update actor",
               "content": {
                 "application/json": {
                   "schema": {
@@ -170,7 +170,7 @@
                         "type": "string"
                       },
                       "data" : {
-                        "$ref": "#/components/schemas/Category"
+                        "$ref": "#/components/schemas/Actor"
                       }
                     }
                   }
@@ -181,23 +181,23 @@
         },
         "delete": {
           "security": [{
-            "CategoryAuth" : []
+            "JWTAuth" : []
           }],
-          "tags": ["Category API"],
-          "summary": "Delete category by Id",
-          "description": "Delete category by id",
+          "tags": ["Actor API"],
+          "summary": "Delete actor by Id",
+          "description": "Delete actor by id",
           "parameters": [
             {
               "schema":{},
               "required": true,
-              "name": "categoryId",
+              "name": "actorId",
               "in": "path",
-              "description": "Category Id"
+              "description": "actor Id"
             }
           ],
           "responses": {
             "200" : {
-              "description": "Success delete category",
+              "description": "Success delete actor",
               "content": {
                 "application/json": {
                   "schema": {
@@ -220,32 +220,55 @@
     },
     "components": {
       "securitySchemes": {
-        "CategoryAuth" : {
+        "JWTAuth" : {
           "type": "apiKey",
           "in" : "header",
-          "name": "X-API-Key",
+          "name": "Authentication",
           "description": "Authentication for Category API"
         }
       },
       "schemas": {
-        "CreateOrUpdateCategory" : {
+        "UpdateActor" : {
           "type": "object",
           "properties": {
-            "name": {
+            "actor_id": {
+              "type": "number"
+            },
+            "first_name": {
+              "type": "string"
+            },
+            "last_name": {
               "type": "string"
             }
           }
         },
-        "Category" : {
+        "CreateActor" : {
           "type": "object",
           "properties": {
-            "id": {
+            "first_name": {
+              "type": "string"
+            },
+            "last_name": {
+              "type": "string"
+            }
+          }
+        },
+        "Actor" : {
+          "type": "object",
+          "properties": {
+            "actor_id": {
               "type": "number"
             },
-            "name": {
+            "first_name": {
+                "type": "string"
+            },
+            "last_name": {
+                "type": "string"
+            },
+            "last_update": {
                 "type": "string"
             }
-            }
+          }
         }
         }
     }

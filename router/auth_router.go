@@ -29,8 +29,12 @@ func AuthRouter(r *gin.Engine) {
 	if !ok {
 		fmt.Println(users)
 	}
-	var service service.Authentication = service.NewAuthentication(users)
-	var controller controller.AuthController = controller.NewAuthController(service)
+
+	var (
+		authService service.Authentication    = service.NewAuthentication(users)
+		jwtService  service.JWTService        = service.NewJWTService()
+		controller  controller.AuthController = controller.NewAuthController(authService, jwtService)
+	)
 
 	r.POST("/api/auth/login", controller.Login)
 }

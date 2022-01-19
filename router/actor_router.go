@@ -21,7 +21,7 @@ func ActorRouter(r *gin.Engine) {
 		controller controller.ActorController = controller.NewActorController(service)
 	)
 
-	authorized := r.Group("/api/actor", middlewares.BasicAuth())
+	authorized := r.Group("/api/actor", middlewares.JWTAuthentication())
 
 	authorized.GET("/:id", controller.FindById)
 	authorized.GET("/", controller.FindAll)
