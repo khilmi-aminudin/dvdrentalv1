@@ -7,6 +7,7 @@ import (
 
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 	"github.com/khilmi-aminudin/dvdrentalv1/models/entity"
+	"github.com/sirupsen/logrus"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -18,6 +19,8 @@ type UserRepository interface {
 	FindById(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users
 	FindAll(ctx context.Context, tx pgx.Tx) []entity.Users
 	FindByUsername(ctx context.Context, tx pgx.Tx, username string) entity.Users
+	NewOTP(ctx context.Context, tx pgx.Tx, username string) string
+	ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) bool
 }
 
 type userRepository struct{}
@@ -119,4 +122,39 @@ func (repository *userRepository) FindById(ctx context.Context, tx pgx.Tx, user 
 	}
 
 	return result
+}
+
+func (repository *userRepository) NewOTP(ctx context.Context, tx pgx.Tx, username string) string {
+	queryString := "UPDATE users SET tokens = $2 WHERE username = $1 RETURNING tokens;"
+
+	token := helper.EncodeToString(6)
+
+	cmdTag, err := tx.Exec(ctx, queryString, username, token)
+	if err != nil {
+		logrus.New().Error(err.Error())
+		return ""
+	}
+
+	if cmdTag.Update() {
+		return token
+	}
+	return ""
+}
+
+func (repository *userRepository) ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) bool {
+	queryString := "UPDATE users SET tokens = '--' WHERE username = $1 AND tokens = $2 RETURNING tokens;"
+
+	cmdTag, err := tx.Exec(ctx, queryString, username, tokens)
+
+	if err != nil {
+		logrus.New().Error(err.Error())
+		return false
+	}
+
+	if cmdTag.Update() {
+		return true
+	}
+
+	return false
+
 }

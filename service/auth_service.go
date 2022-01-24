@@ -21,7 +21,6 @@ func NewAuthentication(listusers []entity.Users) Authentication {
 	}
 }
 func (auth *authentication) Login(username string, password string) bool {
-
 	for _, user := range auth.users {
 		fmt.Printf("username : %s\npassword : %s\n", user.Username, user.Passowrd)
 		if user.Username == username && user.Passowrd == password {

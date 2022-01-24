@@ -23,6 +23,8 @@ type UserService interface {
 	FindById(ctx context.Context, userid int64) web.ResponseWeb
 	FindAll(ctx context.Context) web.ResponseWeb
 	FindByUsername(ctx context.Context, username string) web.ResponseWeb
+	NewOTP(ctx context.Context, tx pgx.Tx, username string) web.ResponseWeb
+	ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) web.ResponseWeb
 }
 
 type userService struct {
@@ -159,5 +161,47 @@ func (service *userService) FindById(ctx context.Context, userid int64) web.Resp
 		Code:   http.StatusOK,
 		Status: "Success",
 		Data:   user,
+	}
+}
+
+func (service *userService) NewOTP(ctx context.Context, tx pgx.Tx, username string) web.ResponseWeb {
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
+
+	otp := service.Repository.NewOTP(ctx, tx, username)
+	if otp == "" {
+		return web.ResponseWeb{
+			Code:   http.StatusBadRequest,
+			Status: "Bad Request",
+		}
+	}
+
+	return web.ResponseWeb{
+		Code:   http.StatusOK,
+		Status: "Success",
+		Data:   otp,
+	}
+}
+
+func (service *userService) ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) web.ResponseWeb {
+	tx, err := service.DBConn.Begin(ctx)
+	helper.PanicIfError(err)
+
+	defer helper.CommirOrRollback(tx, ctx)
+
+	cleared := service.Repository.ClearOTP(ctx, tx, username, tokens)
+
+	if cleared {
+		return web.ResponseWeb{
+			Code:   http.StatusOK,
+			Status: "Success",
+		}
+	}
+
+	return web.ResponseWeb{
+		Code:   http.StatusBadRequest,
+		Status: "Bad Request",
 	}
 }
