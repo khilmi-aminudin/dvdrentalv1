@@ -15,7 +15,7 @@ import (
 )
 
 type ActorService interface {
-	Create(ctx context.Context, requset web.RequestCreateActor) web.ResponseWeb
+	Create(ctx context.Context, request web.RequestCreateActor) web.ResponseWeb
 	FindAll(ctx context.Context) web.ResponseWeb
 	Search(ctx context.Context, key string) web.ResponseWeb
 	Update(ctx context.Context, request web.RequestUpdateActor) web.ResponseWeb
@@ -37,8 +37,8 @@ func NewActorService(repository repository.ActorRepository, db *pgx.Conn, valida
 	}
 }
 
-func (service *actorService) Create(ctx context.Context, requset web.RequestCreateActor) web.ResponseWeb {
-	err := service.Validator.Struct(requset)
+func (service *actorService) Create(ctx context.Context, request web.RequestCreateActor) web.ResponseWeb {
+	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
 	tx, err := service.DBConn.Begin(ctx)
@@ -46,7 +46,7 @@ func (service *actorService) Create(ctx context.Context, requset web.RequestCrea
 
 	defer helper.CommirOrRollback(tx, ctx)
 
-	actor := service.Repository.Create(ctx, tx, entity.Actor{FirstName: requset.FirstName, LastName: requset.LastName})
+	actor := service.Repository.Create(ctx, tx, entity.Actor{FirstName: request.FirstName, LastName: request.LastName})
 
 	return web.ResponseWeb{
 		Code:   http.StatusOK,

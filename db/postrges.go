@@ -7,14 +7,10 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/joho/godotenv"
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 )
 
 func ConnectDBWithPGX() *pgx.Conn {
-	err := godotenv.Load()
-	helper.PanicIfError(err)
-
 	var (
 		dbName   = os.Getenv("DB_NAME")
 		dbUser   = os.Getenv("DB_USER")

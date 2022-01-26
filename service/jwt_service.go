@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/joho/godotenv"
 	"github.com/khilmi-aminudin/dvdrentalv1/helper"
 )
 
@@ -38,7 +37,7 @@ func (service *jwtService) GenerateToken(username string, isSignin bool) string 
 		username,
 		isSignin,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 10).Unix(),
 			Issuer:    service.issuer,
 			IssuedAt:  time.Now().Unix(),
 		},
@@ -62,8 +61,6 @@ func (service *jwtService) ValidateToken(tokenstring string) (*jwt.Token, error)
 }
 
 func getSecretKey() string {
-	err := godotenv.Load()
-	helper.PanicIfError(err)
 
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
@@ -73,8 +70,6 @@ func getSecretKey() string {
 }
 
 func getIssuer() string {
-	err := godotenv.Load()
-	helper.PanicIfError(err)
 	issuer := os.Getenv("JWT_ISSUER")
 	if issuer == "" {
 		issuer = "issuer"
