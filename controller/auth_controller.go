@@ -8,6 +8,7 @@ import (
 	"github.com/khilmi-aminudin/dvdrentalv1/models/dto"
 	"github.com/khilmi-aminudin/dvdrentalv1/models/web"
 	"github.com/khilmi-aminudin/dvdrentalv1/service"
+	"github.com/sirupsen/logrus"
 )
 
 type AuthController interface {
@@ -43,6 +44,10 @@ func (controller *authcontroller) Login(c *gin.Context) {
 	hashedpassword := helper.NewSHA256([]byte(credential.Password))
 	isSignin := controller.auth.Login(credential.Username, hashedpassword)
 	if !isSignin {
+
+		helper.LoggerInit().WithFields(logrus.Fields{
+			"credential": credential,
+		}).Error("username or password wrong")
 
 		c.JSON(http.StatusUnauthorized, web.ResponseWeb{
 			Code:   http.StatusUnauthorized,

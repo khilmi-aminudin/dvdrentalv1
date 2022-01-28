@@ -29,13 +29,14 @@ func NewuserRepository() UserRepository {
 func (repository *userRepository) Create(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users {
 	queryString := "INSERT INTO users(username, password) VALUES ($1,$2);"
 	cmdTag, err := tx.Exec(ctx, queryString, user.Username, user.Passowrd)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 	if cmdTag.Insert() {
 		return entity.Users{
 			Username: user.Username,
 			Passowrd: user.Passowrd,
 		}
 	}
+
 	return entity.Users{}
 }
 
@@ -43,7 +44,7 @@ func (repository *userRepository) FindAll(ctx context.Context, tx pgx.Tx) []enti
 	queryString := "SELECT user_id, username ,password, last_update FROM users;"
 
 	rows, err := tx.Query(ctx, queryString)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	var users []entity.Users
 
@@ -69,7 +70,7 @@ func (repository *userRepository) FindByUsername(ctx context.Context, tx pgx.Tx,
 
 	var user entity.Users
 	err := row.Scan(&user.UserId, &user.Username, &user.Passowrd, &user.LastUpdate)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	return user
 }
@@ -78,7 +79,7 @@ func (repository *userRepository) Update(ctx context.Context, tx pgx.Tx, user en
 	queryString := "UPDATE users SET username = $1, password = $2, last_update $3 WHERE username = $1;"
 
 	cmdTag, err := tx.Exec(ctx, queryString, user.Username, user.Passowrd, user.LastUpdate)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	var result entity.Users
 	if cmdTag.Update() {
@@ -113,8 +114,8 @@ func (repository *userRepository) FindById(ctx context.Context, tx pgx.Tx, user 
 	var result entity.Users
 
 	err := row.Scan(&result.UserId, &result.Username, &result.Passowrd, &result.LastUpdate)
-	// helper.PanicIfError(err)
-	if err == *&sql.ErrNoRows {
+	// helper.LogError(helper.LoggerInit(),err)
+	if err == sql.ErrNoRows {
 		return result
 	}
 

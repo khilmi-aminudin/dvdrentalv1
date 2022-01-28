@@ -22,6 +22,6 @@ func ConnectDBWithPGX() *pgx.Conn {
 
 	var connectionString = fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable", dbDriver, dbUser, dbPass, dbHost, dbPort, dbName)
 	connection, err := pgx.Connect(context.Background(), connectionString)
-	helper.PanicIfError(err)
+	helper.FatalError(err)
 	return connection
 }

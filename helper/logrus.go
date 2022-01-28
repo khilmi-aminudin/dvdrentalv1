@@ -18,5 +18,14 @@ func init() {
 }
 
 func LoggerInit() *logrus.Logger {
+	logger.SetLevel(logrus.TraceLevel)
 	return logger
+}
+
+func LogError(err error) {
+	if err != nil {
+		LoggerInit().WithFields(logrus.Fields{
+			"error ": err.Error(),
+		}).Error(err)
+	}
 }

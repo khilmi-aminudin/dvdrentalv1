@@ -32,7 +32,7 @@ func (repository *actorRepository) Create(ctx context.Context, tx pgx.Tx, actor 
 
 	var result entity.Actor
 	cmdTag, err := tx.Exec(ctx, queryString, actor.FirstName, actor.LastName)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	if cmdTag.RowsAffected() < 1 {
 		return result
@@ -48,7 +48,7 @@ func (repository *actorRepository) Update(ctx context.Context, tx pgx.Tx, actor 
 	queryString := "UPDATE actor SET first_name = $2, last_name = $3 WHERE actor_id = $1;"
 
 	cmdTag, err := tx.Exec(ctx, queryString, actor.ActorId, actor.FirstName, actor.LastName)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	var result entity.Actor
 	if cmdTag.RowsAffected() < 1 {
@@ -82,8 +82,8 @@ func (repository *actorRepository) FindById(ctx context.Context, tx pgx.Tx, acto
 	var result entity.Actor
 
 	err := row.Scan(&result.ActorId, &result.FirstName, &result.LastName, &result.LastUpdate)
-	// helper.PanicIfError(err)
-	if err == *&sql.ErrNoRows {
+
+	if err == sql.ErrNoRows {
 		return result
 	}
 
@@ -95,13 +95,13 @@ func (repository *actorRepository) FindAll(ctx context.Context, tx pgx.Tx) []ent
 	queryString := "SELECT actor_id, first_name,last_name,last_update FROM actor;"
 
 	rows, err := tx.Query(ctx, queryString)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	var result []entity.Actor
 	for rows.Next() {
 		var actor entity.Actor
 		err = rows.Scan(&actor.ActorId, &actor.FirstName, &actor.LastName, &actor.LastUpdate)
-		helper.PanicIfError(err)
+		helper.LogError(err)
 		result = append(result, actor)
 	}
 
@@ -111,13 +111,13 @@ func (repository *actorRepository) FindAll(ctx context.Context, tx pgx.Tx) []ent
 func (repository *actorRepository) Search(ctx context.Context, tx pgx.Tx, key string) []entity.Actor {
 	queryString := fmt.Sprintf("SELECT actor_id, first_name,last_name,last_update FROM actor WHERE LOWER(first_name) LIKE '%%%s' OR LOWER(first_name) LIKE '%s%%' OR LOWER(first_name) LIKE '%%%s%%' OR LOWER(last_name) LIKE '%%%s' OR LOWER(last_name) LIKE '%s%%' OR LOWER(last_name) LIKE '%%%s%%';;", key, key, key, key, key, key)
 	rows, err := tx.Query(ctx, queryString)
-	helper.PanicIfError(err)
+	helper.LogError(err)
 
 	var result []entity.Actor
 	for rows.Next() {
 		var actor entity.Actor
 		err = rows.Scan(&actor.ActorId, &actor.FirstName, &actor.LastName, &actor.LastUpdate)
-		helper.PanicIfError(err)
+		helper.LogError(err)
 		result = append(result, actor)
 	}
 

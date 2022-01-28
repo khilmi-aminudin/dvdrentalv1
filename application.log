@@ -1,0 +1,5 @@
+time="2022-01-28T14:55:37+07:00" level=error msg="Token is expired" error="Token is expired"
+time="2022-01-28T15:19:28+07:00" level=error msg="username or password wrong" password=1234q5678q username=superadmin1
+time="2022-01-28T15:20:46+07:00" level=error msg="username or password wrong" credential="{superadmin1 1234q5678q}"
+time="2022-01-28T15:21:02+07:00" level=error msg="username or password wrong" credential="{superadmin1 1234q5678q}"
+time="2022-01-28T15:24:09+07:00" level=error msg="username or password wrong" credential="{superadmin1 1234q5678q}"
