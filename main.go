@@ -5,9 +5,5 @@ import (
 )
 
 func main() {
-	// r := gin.Default()
-	// router.InitRouter(r, router.UserRouter, router.ActorRouter, router.AuthRouter)
-	// r.Run()
-
 	router.ServeRouter()
 }
