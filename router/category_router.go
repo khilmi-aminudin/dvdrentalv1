@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/khilmi-aminudin/dvdrentalv1/controller"
 	"github.com/khilmi-aminudin/dvdrentalv1/db"
+	"github.com/khilmi-aminudin/dvdrentalv1/middlewares"
 	"github.com/khilmi-aminudin/dvdrentalv1/repository"
 	"github.com/khilmi-aminudin/dvdrentalv1/service"
 )
@@ -19,10 +20,12 @@ func CategoryRouter(r *gin.Engine) {
 		controller controller.CategoryController = controller.NewCategoryController(service)
 	)
 
-	r.POST("/api/category", controller.Create)
-	r.PUT("/api/category/:id", controller.Update)
-	r.DELETE("/api/category/:id", controller.Delete)
+	authorized := r.Group("/api/category", middlewares.JWTAuthentication())
 
-	r.GET("/api/category/:id", controller.FindById)
-	r.GET("/api/categories", controller.FindAll)
+	authorized.POST("/", controller.Create)
+	authorized.PUT("/:id", controller.Update)
+	authorized.DELETE("/:id", controller.Delete)
+
+	authorized.GET("/:id", controller.FindById)
+	authorized.GET("/", controller.FindAll)
 }
