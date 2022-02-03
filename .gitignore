@@ -1,2 +1,4 @@
 apispec.yml
 application.log
+.vscode/
+dvdrental_test.session.sql
