@@ -23,8 +23,8 @@ type UserService interface {
 	FindById(ctx context.Context, userid int64) web.ResponseWeb
 	FindAll(ctx context.Context) web.ResponseWeb
 	FindByUsername(ctx context.Context, username string) web.ResponseWeb
-	NewOTP(ctx context.Context, tx pgx.Tx, username string) web.ResponseWeb
-	ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) web.ResponseWeb
+	NewOTP(ctx context.Context, username string) web.ResponseWeb
+	ClearOTP(ctx context.Context, username string, tokens string) web.ResponseWeb
 }
 
 type userService struct {
@@ -53,6 +53,7 @@ func (service *userService) Create(ctx context.Context, request web.RequestCreat
 	hashedPassword := helper.NewSHA256([]byte(request.Passowrd))
 
 	user := service.Repository.Create(ctx, tx, entity.Users{
+		Email:    request.Email,
 		Username: request.Username,
 		Passowrd: hashedPassword,
 	})
@@ -164,7 +165,7 @@ func (service *userService) FindById(ctx context.Context, userid int64) web.Resp
 	}
 }
 
-func (service *userService) NewOTP(ctx context.Context, tx pgx.Tx, username string) web.ResponseWeb {
+func (service *userService) NewOTP(ctx context.Context, username string) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 
@@ -185,7 +186,7 @@ func (service *userService) NewOTP(ctx context.Context, tx pgx.Tx, username stri
 	}
 }
 
-func (service *userService) ClearOTP(ctx context.Context, tx pgx.Tx, username string, tokens string) web.ResponseWeb {
+func (service *userService) ClearOTP(ctx context.Context, username string, tokens string) web.ResponseWeb {
 	tx, err := service.DBConn.Begin(ctx)
 	helper.PanicIfError(err)
 

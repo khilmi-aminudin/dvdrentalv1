@@ -30,11 +30,12 @@ func NewuserRepository() UserRepository {
 }
 
 func (repository *userRepository) Create(ctx context.Context, tx pgx.Tx, user entity.Users) entity.Users {
-	queryString := "INSERT INTO users(username, password) VALUES ($1,$2);"
-	cmdTag, err := tx.Exec(ctx, queryString, user.Username, user.Passowrd)
+	queryString := "INSERT INTO users(email, username, password) VALUES ($1,$2,$3);"
+	cmdTag, err := tx.Exec(ctx, queryString, user.Email, user.Username, user.Passowrd)
 	helper.LogError(err)
 	if cmdTag.Insert() {
 		return entity.Users{
+			Email:    user.Email,
 			Username: user.Username,
 			Passowrd: user.Passowrd,
 		}

@@ -11,13 +11,13 @@ func CommirOrRollback(tx pgx.Tx, ctx context.Context) {
 	if err != nil {
 		errorRollback := tx.Rollback(ctx)
 		if errorRollback != nil {
-			panic(errorRollback.Error())
+			LoggerInit().Warn(errorRollback.Error())
 		}
 
 	} else {
 		errorCommit := tx.Commit(ctx)
 		if errorCommit != nil {
-			panic(errorCommit.Error())
+			LoggerInit().Warn(errorCommit.Error())
 		}
 	}
 }
