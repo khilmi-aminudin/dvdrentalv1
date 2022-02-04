@@ -17,6 +17,6 @@ func ServeRouter() {
 	helper.PanicIfError(err)
 
 	r := gin.Default()
-	InitRouter(r, UserRouter, ActorRouter, AuthRouter, CategoryRouter)
+	InitRouter(r, UserRouter, ActorRouter, AuthRouter, CategoryRouter, ExcelRouter)
 	r.Run()
 }

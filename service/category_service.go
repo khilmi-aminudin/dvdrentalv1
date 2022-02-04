@@ -38,7 +38,10 @@ func (service *categoryService) Create(ctx context.Context, request web.RequestC
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -57,7 +60,10 @@ func (service *categoryService) Update(ctx context.Context, request web.RequestU
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -73,7 +79,10 @@ func (service *categoryService) Update(ctx context.Context, request web.RequestU
 }
 
 func (service *categoryService) Delete(ctx context.Context, categoryId int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -94,7 +103,10 @@ func (service *categoryService) Delete(ctx context.Context, categoryId int64) we
 }
 
 func (service *categoryService) FindById(ctx context.Context, categoryId int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -108,7 +120,10 @@ func (service *categoryService) FindById(ctx context.Context, categoryId int64) 
 }
 
 func (service *categoryService) FindAll(ctx context.Context) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)

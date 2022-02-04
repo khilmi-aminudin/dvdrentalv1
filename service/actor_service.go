@@ -41,7 +41,10 @@ func (service *actorService) Create(ctx context.Context, request web.RequestCrea
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -56,7 +59,10 @@ func (service *actorService) Create(ctx context.Context, request web.RequestCrea
 }
 
 func (service *actorService) FindAll(ctx context.Context) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -71,7 +77,10 @@ func (service *actorService) FindAll(ctx context.Context) web.ResponseWeb {
 }
 
 func (service *actorService) Search(ctx context.Context, key string) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -89,7 +98,10 @@ func (service *actorService) Update(ctx context.Context, request web.RequestUpda
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -104,7 +116,10 @@ func (service *actorService) Update(ctx context.Context, request web.RequestUpda
 }
 
 func (service *actorService) Delete(ctx context.Context, actorId int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -137,7 +152,10 @@ func (service *actorService) Delete(ctx context.Context, actorId int64) web.Resp
 }
 
 func (service *actorService) FindById(ctx context.Context, actorId int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)

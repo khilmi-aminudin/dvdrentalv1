@@ -45,7 +45,10 @@ func (service *userService) Create(ctx context.Context, request web.RequestCreat
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -66,7 +69,10 @@ func (service *userService) Create(ctx context.Context, request web.RequestCreat
 }
 
 func (service *userService) FindAll(ctx context.Context) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -81,7 +87,10 @@ func (service *userService) FindAll(ctx context.Context) web.ResponseWeb {
 }
 
 func (service *userService) FindByUsername(ctx context.Context, username string) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 	defer helper.CommirOrRollback(tx, ctx)
 
@@ -98,7 +107,10 @@ func (service *userService) Update(ctx context.Context, request web.RequestUpdat
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -118,7 +130,10 @@ func (service *userService) Update(ctx context.Context, request web.RequestUpdat
 }
 
 func (service *userService) Delete(ctx context.Context, userid int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -141,7 +156,10 @@ func (service *userService) Delete(ctx context.Context, userid int64) web.Respon
 }
 
 func (service *userService) FindById(ctx context.Context, userid int64) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -166,7 +184,10 @@ func (service *userService) FindById(ctx context.Context, userid int64) web.Resp
 }
 
 func (service *userService) NewOTP(ctx context.Context, username string) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
@@ -187,7 +208,10 @@ func (service *userService) NewOTP(ctx context.Context, username string) web.Res
 }
 
 func (service *userService) ClearOTP(ctx context.Context, username string, tokens string) web.ResponseWeb {
-	tx, err := service.DBConn.Begin(ctx)
+	conn := service.DBConn
+	defer conn.Close(ctx)
+
+	tx, err := conn.Begin(ctx)
 	helper.PanicIfError(err)
 
 	defer helper.CommirOrRollback(tx, ctx)
